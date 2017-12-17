@@ -37,17 +37,11 @@ $abroad = (isset($_POST['18']))?$_POST['18']:'';//Готовность рабо�
 
 //Языки
 
-$lang = (isset($_POST['английский']))?$_POST['английский']:'';//Знание языков
-$lang2 = (isset($_POST['немецкий']))?$_POST['немецкий']:'';//Знание языков
-$lang3 = (isset($_POST['французский']))?$_POST['французский']:'';//Знание языков
-$lang4 = (isset($_POST['итальянский']))?$_POST['итальянский']:'';//Знание языков
-$lang5 = (isset($_POST['испанский']))?$_POST['испанский']:'';//Знание языков
-$lang6 = (isset($_POST['китайский']))?$_POST['китайский']:'';//Знание языков
-$lang7 = (isset($_POST['японский']))?$_POST['японский']:'';//Знание языков
-$lang_out .= $lang.'||'. $lang2.'||'. $lang3.'||'. $lang4.'||'. $lang5.'||'. $lang6.'||'. $lang7.'||';
-$lang_out = ltrim ($lang_out, "|");
-$lang_out = rtrim ($lang_out, "|");
-
+$lang = (isset($_POST['15']))?$_POST['15']:'';//Знание языков
+foreach ($lang as $value)
+$lang .= $value.'||';
+$lang = rtrim ($lang, "|");
+$lang = ltrim ($lang, "Array");
 //test ajax
 $ajax = (isset($_POST['lastname']))?$_POST['lastname']:'';
 
@@ -107,7 +101,7 @@ $tvs->setTVValue(32, $l_hair);//длина волос
 $tvs->setTVValue(47, $weight);//Вес
 $tvs->setTVValue(5, $clothing);//р-р одежды
 $tvs->setTVValue(12, $shoes);//р-р обуви
-$tvs->setTVValue(15, $lang_out);//Языки
+$tvs->setTVValue(15, $lang);//Языки
 $tvs->setTVValue(18, $abroad);//Готовность работать за границей
 $tvs->setTVValue(52, $get_services);//Категории
 $tvs->setTVValue(14, $work);//work
@@ -132,7 +126,6 @@ $l_hair_options = '';
 $eyes_options = '';
 $work_options = '';
 $language_options = '';
-$abroad_options = '';
 $services_options = '';
 // Формируем данные вывода
 
@@ -162,9 +155,6 @@ break;
 case 15: //Знание языков
 $tv_array['language'][$data['name']] = $data['elements'];
 break;
-case 18: //Готовность работать за границей
-$tv_array['abroad'][$data['name']] = $data['elements'];
-break;
 }
 }
 $gender_array = array( array('option' => '', 'val' => ''),
@@ -173,8 +163,6 @@ $gender_array = array( array('option' => '', 'val' => ''),
 //пол
 foreach ($gender_array as $val)
 $gender_options .= '<option value="'.$val['option'].'" '.(($val['option'] == $gender)?'selected':'').'>'.$val['val'].'</option>';
-
-$abroad_array = array('Готова к работе за рубежом','Не готова к работе за рубежом' );
 
 //Внешность
 
@@ -226,19 +214,21 @@ foreach ($work_array as $val)
 ($i == 1)?$work_options .= '<option value="" '.(('' == $work)?'selected':'').'>'.$val.'</option>':$work_options .= '<option value="'.$val.'" '.(($val == $work)?'selected':'').'>'.$val.'</option>';
 $i++;
 }
-
-foreach ($tv_array['language'] as $value)
-$language_array .= $value;
-
-$language_array = explode(",", str_replace("||", ",", $language_array));
-
+//-------------------ЯЗЫКИ---------------------------------------------------------------------
+foreach ($tv_array['language'] as $key=> $value)$language_array .= $value;
+    $language_array =  explode(",", str_replace("||", ",", $language_array));
 foreach ($language_array as $val)
-$language_options .= '<input type="checkbox" name="'.$val.'" value="'.$val.'" '.(($val == $lang||$val == $lang2||$val == $lang3||$val == $lang4||$val == $lang5||$val == $lang6||$val == $lang7)?'checked':'').'><span>'.$val.'</span>';
+{
+$language_options .= '<input type="checkbox" name="15[]" value="'.$val.'" '.((preg_match('/'.$val.'/uis', $lang))?'checked':'').'><span>'.$val.'</span>';
+}
+
+//----------------Заграница---------------------------------------------------------------------
+
 
 //получаем титлы услуг
 $services = $modx->getCollection('modResource',array('parent'=>4));
 
-//----------------------------------------------------------------------------------------------------
+
 foreach($services as $key){
 $services_options .= '<option value="'.$key->get('id').'" '.(( preg_match('/('.$key->get('id').'\|)|(\|'.$key->get('id').')/',$get_services))?'selected':'').'>'.$key->get('pagetitle').'</option>';
 }
@@ -521,8 +511,8 @@ $result = '
 </div>
 <div style="float:left;width:245px;height: 25px;">Готов(ва) работать за рубежом</div>
 <div style="float:left;width: 325px;">
-<input type="radio" name="18" value="'.$abroad.'"><span style="width: 20px;">Да</span>
-<input type="radio" name="18" value="'.$abroad.'"><span style="width: 20px;">Нет</span>
+<input type="radio" name="18" value="Готова к работе за рубежом"  '.(('Готова к работе за рубежом' == $abroad)?'checked':'').'><span style="width: 20px;">Да</span>
+<input type="radio" name="18" value="Не готова к работе за рубежом" '.(('Не готова к работе за рубежом' == $abroad)?'checked':'').'><span style="width: 20px;">Нет</span>
 </div>
 </div>
 </div>
